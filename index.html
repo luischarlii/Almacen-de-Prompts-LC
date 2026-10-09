@@ -3,806 +3,1039 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#101114">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b0b0d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
 <title>Almacén de Prompts LC</title>
 
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-*{box-sizing:border-box}
-:root{
-  color-scheme:dark;
-  --bg:#101114;
-  --panel:#1b1c21;
-  --panel2:#25262d;
-  --text:#f5f5f7;
-  --muted:#b4b5be;
-  --gold:#e5bb62;
-  --line:#373842;
-  --danger:#ff8888;
+:root {
+  color-scheme: dark;
+  --bg: #0b0b0d;
+  --panel: #141417;
+  --panel2: #1b1b20;
+  --gold: #d9b56d;
+  --gold2: #f2d99c;
+  --text: #f5f1e8;
+  --muted: #9998a1;
+  --line: #303036;
+  --danger: #ff7777;
+  --radius: 20px;
 }
-body{
-  margin:0;
-  background:var(--bg);
-  color:var(--text);
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(ellipse at 50% -15%, rgba(217,181,109,.13), transparent 45%),
+    var(--bg);
+  color: var(--text);
+  font-family: "DM Sans", sans-serif;
 }
-header{
-  padding:22px 16px;
-  text-align:center;
-  border-bottom:1px solid var(--line);
-  background:#15161a;
+button, input, textarea, select { font: inherit; }
+button { cursor: pointer; }
+button:disabled { opacity: .55; cursor: wait; }
+button:focus-visible, input:focus-visible, textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
 }
-.logo{
-  font-size:28px;
-  font-weight:800;
-  letter-spacing:.5px;
+.shell {
+  width: min(100% - 28px, 1000px);
+  margin: auto;
+  padding: 24px 0 48px;
 }
-.logo span{color:var(--gold)}
-header p{color:var(--muted);margin:8px 0 0}
-main{width:min(900px,100%);margin:auto;padding:16px}
-.panel{
-  background:var(--panel);
-  border:1px solid var(--line);
-  border-radius:16px;
-  padding:16px;
-  margin-bottom:16px;
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  margin-bottom: 30px;
 }
-h2{font-size:19px;margin:0 0 14px}
-h3{margin:0 0 8px;font-size:17px}
-label{
-  display:block;
-  color:var(--muted);
-  font-size:13px;
-  margin:12px 0 6px;
+.logo {
+  width: 54px;
+  height: 54px;
+  flex: 0 0 54px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(217,181,109,.8);
+  border-radius: 17px;
+  background: linear-gradient(145deg,#282116,#111);
+  box-shadow: 0 0 28px rgba(217,181,109,.08), inset 0 0 18px #d9b56d0b;
+  color: var(--gold2);
+  font-family: "Playfair Display", serif;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -3px;
+  padding-right: 3px;
 }
-input,textarea,select{
-  width:100%;
-  padding:12px;
-  border:1px solid var(--line);
-  border-radius:10px;
-  background:#111216;
-  color:var(--text);
-  font-size:16px;
+.brand-name {
+  margin: 0;
+  font-family: "Playfair Display", serif;
+  font-size: clamp(20px, 4vw, 27px);
+  line-height: 1.2;
 }
-textarea{min-height:145px;resize:vertical}
-button{
-  border:0;
-  border-radius:10px;
-  padding:12px 15px;
-  background:var(--gold);
-  color:#17130a;
-  font-size:15px;
-  font-weight:700;
-  cursor:pointer;
+.brand-name span { color: var(--gold); }
+.brand-sub {
+  margin: 5px 0 0;
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
 }
-button.secondary{
-  background:var(--panel2);
-  color:var(--text);
-  border:1px solid var(--line);
+.hero {
+  padding: 25px 22px;
+  margin-bottom: 20px;
+  border: 1px solid #3b3223;
+  border-radius: 24px;
+  background: linear-gradient(125deg, #211b12, #151417 62%, #101012);
+  position: relative;
+  overflow: hidden;
 }
-button.danger{background:#552b30;color:#fff}
-button:disabled{opacity:.5;cursor:wait}
-.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
-.actions button{flex:1}
-.hidden{display:none!important}
-.status{
-  white-space:pre-wrap;
-  overflow-wrap:anywhere;
-  font-size:14px;
-  line-height:1.5;
-  margin-top:12px;
+.hero:after {
+  content: "LC";
+  position: absolute;
+  right: -5px;
+  bottom: -35px;
+  color: #d9b56d09;
+  font-family: "Playfair Display", serif;
+  font-size: 155px;
+  font-weight: 700;
+  pointer-events: none;
 }
-.auth-status{color:var(--gold)}
-.app-status{color:var(--muted)}
-.error{color:var(--danger)}
-.hint{font-size:13px;color:var(--muted);line-height:1.5}
-.prompt-card{
-  border:1px solid var(--line);
-  background:#17181d;
-  padding:14px;
-  border-radius:12px;
-  margin-top:12px;
+.eyebrow {
+  color: var(--gold);
+  text-transform: uppercase;
+  font-size: 10px;
+  letter-spacing: 2.5px;
+  font-weight: 700;
 }
-.prompt-meta{font-size:12px;color:var(--muted);margin-bottom:8px}
-.prompt-content{
-  white-space:pre-wrap;
-  overflow-wrap:anywhere;
-  line-height:1.5;
-  margin:10px 0;
+.hero h2 {
+  position: relative;
+  z-index: 1;
+  margin: 10px 0;
+  max-width: 580px;
+  font-family: "Playfair Display", serif;
+  font-size: clamp(27px, 6vw, 40px);
+  line-height: 1.14;
+  font-weight: 600;
 }
-.empty{color:var(--muted);text-align:center;padding:24px 8px}
-footer{text-align:center;color:var(--muted);font-size:12px;padding:15px}
+.hero p {
+  position: relative;
+  z-index: 1;
+  max-width: 520px;
+  color: #b6b2aa;
+  font-size: 13px;
+  line-height: 1.7;
+  margin: 0;
+}
+.panel {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: linear-gradient(155deg, #19191d, #111114);
+  padding: 20px;
+  margin-bottom: 18px;
+  box-shadow: 0 12px 35px #00000017;
+}
+.panel-heading {
+  margin: 0 0 6px;
+  font-family: "Playfair Display", serif;
+  font-size: 22px;
+}
+.subheading {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
+  margin: 0 0 18px;
+}
+label {
+  display: block;
+  margin: 14px 0 7px;
+  color: #d8d4ca;
+  font-size: 12px;
+  font-weight: 600;
+}
+input, textarea, select {
+  width: 100%;
+  border: 1px solid #37373e;
+  border-radius: 12px;
+  padding: 13px 14px;
+  background: #0d0d10;
+  color: var(--text);
+  font-size: 14px;
+  min-width: 0;
+}
+input::placeholder, textarea::placeholder { color: #696872; }
+textarea { min-height: 150px; resize: vertical; line-height: 1.65; }
+select { appearance: auto; }
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+}
+.btn {
+  border: 1px solid #45434a;
+  border-radius: 12px;
+  padding: 12px 16px;
+  background: #222126;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 700;
+  transition: transform .15s, background .15s;
+}
+.btn:active { transform: scale(.98); }
+.btn-primary {
+  color: #17130c;
+  border-color: var(--gold);
+  background: linear-gradient(135deg, var(--gold2), #c59b4c);
+}
+.btn-primary:hover { background: #f4dba1; }
+.btn-secondary { background: transparent; }
+.btn-danger {
+  color: #ffaaaa;
+  border-color: #673b40;
+  background: #321b20;
+}
+.btn-small { padding: 8px 11px; font-size: 11px; }
+.status {
+  margin-top: 13px;
+  font-size: 12px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.status:empty { display: none; }
+.status.error { color: var(--danger); }
+.status.success { color: #a7ddb2; }
+.status.info { color: var(--gold2); }
+.hidden { display: none !important; }
+.section-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 26px 0 14px;
+}
+.section-title h2 {
+  margin: 0;
+  font-family: "Playfair Display", serif;
+  font-size: 24px;
+}
+.count {
+  color: var(--gold);
+  font-size: 12px;
+  border: 1px solid #59482d;
+  border-radius: 100px;
+  padding: 5px 10px;
+  white-space: nowrap;
+}
+.toolbar {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(120px, .8fr);
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.prompt-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+.prompt-card {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #343238;
+  border-radius: 18px;
+  background: linear-gradient(155deg, #1b1a1e, #121215);
+  padding: 17px;
+  transition: border-color .2s, transform .2s;
+}
+.prompt-card:hover {
+  border-color: #77603a;
+  transform: translateY(-2px);
+}
+.card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+.prompt-card h3 {
+  font-size: 16px;
+  line-height: 1.4;
+  margin: 0 0 10px;
+  overflow-wrap: anywhere;
+}
+.category-pill {
+  display: inline-block;
+  width: fit-content;
+  max-width: 100%;
+  margin-bottom: 12px;
+  border: 1px solid #5b492d;
+  border-radius: 100px;
+  padding: 5px 9px;
+  color: var(--gold2);
+  background: #d9b56d0c;
+  font-size: 10px;
+  overflow-wrap: anywhere;
+}
+.prompt-preview {
+  color: #b9b7c0;
+  font-size: 12px;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  display: -webkit-box;
+  -webkit-line-clamp: 5;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin: 0 0 17px;
+}
+.card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid #2d2c31;
+}
+.card-actions .btn { flex: 1; }
+.empty {
+  grid-column: 1 / -1;
+  padding: 35px 18px;
+  text-align: center;
+  border: 1px dashed #45414a;
+  border-radius: 18px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.7;
+}
+.empty strong {
+  display: block;
+  color: var(--gold2);
+  font-family: "Playfair Display", serif;
+  font-size: 20px;
+  margin-bottom: 7px;
+}
+.editor { scroll-margin-top: 18px; }
+.footer {
+  padding: 25px 0 0;
+  text-align: center;
+  color: #74727a;
+  font-size: 10px;
+  letter-spacing: 1px;
+}
+.footer span { color: var(--gold); }
+@media (max-width: 600px) {
+  .shell { width: min(100% - 22px, 1000px); padding-top: 17px; }
+  .topbar { margin-bottom: 22px; }
+  .logo { width: 48px; height: 48px; flex-basis: 48px; }
+  .brand-sub { font-size: 9px; letter-spacing: 1.5px; }
+  .hero { padding: 22px 18px; }
+  .panel { padding: 17px; }
+  .prompt-list { grid-template-columns: 1fr; }
+  .toolbar { grid-template-columns: 1fr; }
+  .actions .btn { flex: 1 1 auto; }
+}
 </style>
 </head>
 
 <body>
-<header>
-  <div class="logo">Almacén de <span>Prompts LC</span></div>
-  <p>Tu biblioteca personal de prompts</p>
-</header>
-
-<main>
-  <section class="panel" id="configPanel">
-    <h2>Conexión con Supabase</h2>
-    <p class="hint">
-      Introduce la URL del proyecto y la clave pública de Supabase.
-      La URL debe terminar en .supabase.co, sin agregar /rest/v1.
-    </p>
-
-    <label for="projectUrl">URL del proyecto</label>
-    <input id="projectUrl" type="url"
-      placeholder="https://tu-proyecto.supabase.co"
-      autocomplete="url">
-
-    <label for="publicKey">Clave pública (anon/publishable)</label>
-    <input id="publicKey" type="password"
-      placeholder="Pega aquí tu clave pública"
-      autocomplete="off">
-
-    <div class="actions">
-      <button id="connectBtn">Conectar</button>
-      <button id="forgetConfigBtn" class="secondary">Borrar configuración guardada</button>
+<div class="shell">
+  <header class="topbar">
+    <div class="logo" aria-label="LC">LC</div>
+    <div>
+      <h1 class="brand-name">Almacén de Prompts <span>LC</span></h1>
+      <p class="brand-sub">Tu creatividad, siempre organizada</p>
     </div>
-    <div id="configStatus" class="status" role="status" aria-live="polite"></div>
+  </header>
+
+  <section class="hero">
+    <div class="eyebrow">Tu biblioteca creativa</div>
+    <h2>Las mejores ideas<br>merecen un gran lugar.</h2>
+    <p>Guarda, organiza y encuentra tus prompts favoritos para inteligencia artificial desde un solo espacio.</p>
   </section>
 
-  <section class="panel hidden" id="auth">
-    <h2 id="authTitle">Iniciar sesión</h2>
-    <p class="hint">Accede con tu correo y contraseña para ver tus prompts privados.</p>
+  <section id="configPanel" class="panel">
+    <h2 class="panel-heading">Conectar tu biblioteca</h2>
+    <p class="subheading">Introduce la URL de tu proyecto Supabase y tu clave pública para conectar tu cuenta.</p>
+    <label for="projectUrl">URL del proyecto Supabase</label>
+    <input id="projectUrl" type="url" placeholder="https://tu-proyecto.supabase.co" autocomplete="url">
+    <label for="publicKey">Clave pública (anon / publishable)</label>
+    <input id="publicKey" type="password" placeholder="Pega aquí tu clave pública" autocomplete="off">
+    <div class="actions">
+      <button id="connectBtn" class="btn btn-primary">Conectar biblioteca</button>
+      <button id="forgetConfigBtn" class="btn btn-secondary" type="button">Borrar configuración guardada</button>
+    </div>
+    <div id="configStatus" class="status" role="status"></div>
+  </section>
+
+  <section id="auth" class="panel hidden">
+    <h2 id="authTitle" class="panel-heading">Bienvenido a tu biblioteca</h2>
+    <p class="subheading">Inicia sesión para acceder a tus prompts personales.</p>
 
     <label for="email">Correo electrónico</label>
-    <input id="email" type="email"
-      placeholder="tucorreo@ejemplo.com"
-      autocomplete="email">
+    <input id="email" type="email" placeholder="tu@correo.com" autocomplete="email">
 
     <div id="loginPasswordArea">
       <label for="password">Contraseña</label>
-      <input id="password" type="password"
-        placeholder="Mínimo 6 caracteres"
-        autocomplete="current-password">
+      <input id="password" type="password" placeholder="Tu contraseña" autocomplete="current-password">
     </div>
 
     <div id="newPasswordArea" class="hidden">
       <label for="newPassword">Nueva contraseña</label>
-      <input id="newPassword" type="password"
-        placeholder="Escribe tu nueva contraseña"
-        autocomplete="new-password">
+      <input id="newPassword" type="password" placeholder="Escribe tu nueva contraseña" autocomplete="new-password">
     </div>
 
-    <div class="actions" id="authButtons">
-      <button id="loginBtn">Iniciar sesión</button>
-      <button id="registerBtn" class="secondary">Crear cuenta</button>
+    <div id="authButtons" class="actions">
+      <button id="loginBtn" class="btn btn-primary">Iniciar sesión</button>
+      <button id="registerBtn" class="btn btn-secondary">Crear cuenta</button>
     </div>
 
-    <div class="actions" id="recoveryButtons">
-      <button id="forgotBtn" class="secondary">Olvidé mi contraseña</button>
-      <button id="logoutBtn" class="secondary hidden">Cerrar sesión</button>
+    <div id="recoveryButtons" class="actions hidden">
+      <button id="forgotBtn" class="btn btn-primary">Enviar enlace de recuperación</button>
     </div>
 
-    <div class="actions hidden" id="newPasswordButtons">
-      <button id="savePasswordBtn">Guardar nueva contraseña</button>
-      <button id="cancelRecoveryBtn" class="secondary">Cancelar</button>
+    <div id="newPasswordButtons" class="actions hidden">
+      <button id="savePasswordBtn" class="btn btn-primary">Guardar nueva contraseña</button>
+      <button id="cancelRecoveryBtn" class="btn btn-secondary">Volver al inicio</button>
     </div>
 
-    <div id="authStatus" class="status auth-status"
-      role="status" aria-live="polite"></div>
+    <div id="authStatus" class="status" role="status"></div>
   </section>
 
   <section id="app" class="hidden">
-    <section class="panel">
-      <div class="actions" style="margin-top:0">
-        <h2 style="flex:2;margin:auto 0">Mis prompts</h2>
-        <button id="refreshBtn" class="secondary">Actualizar</button>
-        <button id="appLogoutBtn" class="secondary">Salir</button>
+    <div class="panel">
+      <div class="eyebrow">Espacio personal</div>
+      <div class="section-title" style="margin-top:8px">
+        <h2>Mi biblioteca</h2>
+        <span id="userInfo" class="count"></span>
       </div>
+      <p class="subheading">Tus prompts, guardados y organizados en un solo lugar.</p>
+      <div class="actions">
+        <button id="refreshBtn" class="btn btn-secondary">Actualizar biblioteca</button>
+        <button id="appLogoutBtn" class="btn btn-secondary">Cerrar sesión</button>
+      </div>
+    </div>
 
-      <p id="userInfo" class="hint"></p>
+    <section id="editor" class="panel editor">
+      <div class="eyebrow">Crear y editar</div>
+      <h2 id="editorTitle" class="panel-heading" style="margin-top:8px">Añadir nuevo prompt</h2>
+      <p class="subheading">Ponle un título claro y guarda el contenido que quieras reutilizar.</p>
 
-      <label for="search">Buscar prompts</label>
-      <input id="search" type="search"
-        placeholder="Buscar por título, contenido o categoría">
-
-      <label for="filterCategory">Filtrar por categoría</label>
-      <select id="filterCategory">
-        <option value="">Todas las categorías</option>
-      </select>
-
-      <div id="listStatus" class="status app-status"
-        role="status" aria-live="polite"></div>
-      <div id="promptList"></div>
-    </section>
-
-    <section class="panel" id="editor">
-      <h2 id="editorTitle">Agregar un prompt</h2>
-
-      <label for="title">Título</label>
-      <input id="title" maxlength="180"
-        placeholder="Ej. Retrato cinematográfico">
+      <label for="title">Título del prompt</label>
+      <input id="title" type="text" maxlength="180" placeholder="Ej. Retrato cinematográfico hiperrealista">
 
       <label for="category">Categoría</label>
-      <input id="category" maxlength="80"
-        placeholder="Ej. Fotografía, video, publicidad">
+      <input id="category" type="text" maxlength="80" placeholder="Ej. Imágenes, video, publicidad">
 
       <label for="content">Contenido del prompt</label>
-      <textarea id="content"
-        placeholder="Escribe o pega aquí tu prompt..."></textarea>
+      <textarea id="content" placeholder="Escribe o pega aquí tu prompt completo..."></textarea>
 
       <div class="actions">
-        <button id="saveBtn">Guardar prompt</button>
-        <button id="clearBtn" class="secondary">Limpiar</button>
-        <button id="cancelEditBtn" class="secondary hidden">Cancelar edición</button>
+        <button id="saveBtn" class="btn btn-primary">Guardar prompt</button>
+        <button id="clearBtn" class="btn btn-secondary">Limpiar</button>
+        <button id="cancelEditBtn" class="btn btn-secondary hidden">Cancelar edición</button>
       </div>
-
-      <div id="status" class="status app-status"
-        role="status" aria-live="polite"></div>
+      <div id="status" class="status" role="status"></div>
     </section>
-  </section>
-</main>
 
-<footer>Almacén de Prompts LC · Biblioteca privada</footer>
+    <div class="section-title">
+      <h2>Mis prompts</h2>
+      <span id="promptCount" class="count">0 prompts</span>
+    </div>
+
+    <div class="toolbar">
+      <input id="search" type="search" placeholder="Buscar por título o contenido..." aria-label="Buscar prompts">
+      <select id="filterCategory" aria-label="Filtrar por categoría">
+        <option value="">Todas las categorías</option>
+      </select>
+    </div>
+
+    <div id="listStatus" class="status" role="status"></div>
+    <div id="promptList" class="prompt-list"></div>
+  </section>
+
+  <footer class="footer">DISEÑADO CON <span>LC</span> · TU BIBLIOTECA CREATIVA</footer>
+</div>
 
 <script>
-"use strict";
+(() => {
+  "use strict";
 
-const $ = id => document.getElementById(id);
-const CONFIG_STORAGE = "almacenPromptsLC_config";
-const TABLE = "almacen_prompts";
+  const $ = id => document.getElementById(id);
+  const CONFIG_KEY = "almacenPromptsLC_config";
+  const TABLE = "almacen_prompts";
 
-let supabaseClient = null;
-let currentUser = null;
-let prompts = [];
-let editingId = null;
-let busy = false;
-let recoveryMode = false;
+  let supabaseClient = null;
+  let currentUser = null;
+  let prompts = [];
+  let editingId = null;
+  let recoveryMode = false;
+  let recoveryReady = false;
+  let authSubscription = null;
 
-function authMessage(text, error=false){
-  $("authStatus").textContent = text;
-  $("authStatus").classList.toggle("error", error);
-}
-function configMessage(text, error=false){
-  $("configStatus").textContent = text;
-  $("configStatus").classList.toggle("error", error);
-}
-function appMessage(text, error=false){
-  $("status").textContent = text;
-  $("status").classList.toggle("error", error);
-}
-function listMessage(text, error=false){
-  $("listStatus").textContent = text;
-  $("listStatus").classList.toggle("error", error);
-}
-function setBusy(value){
-  busy = value;
-  [
-    "connectBtn","loginBtn","registerBtn","forgotBtn",
-    "savePasswordBtn","saveBtn","refreshBtn"
-  ].forEach(id => {
+  function message(id, text, type = "info") {
     const el = $(id);
-    if(el) el.disabled = value;
-  });
-}
-function configIsValid(url,key){
-  try{
-    const u = new URL(url);
-    return u.protocol === "https:" &&
-      u.hostname.endsWith(".supabase.co") &&
-      !!key.trim();
-  }catch{
-    return false;
-  }
-}
-function showAuth(){
-  $("auth").classList.remove("hidden");
-  $("app").classList.add("hidden");
-}
-function showApp(){
-  $("auth").classList.add("hidden");
-  $("app").classList.remove("hidden");
-  $("configPanel").classList.add("hidden");
-}
-function showLoggedOut(){
-  currentUser = null;
-  prompts = [];
-  $("app").classList.add("hidden");
-  $("auth").classList.remove("hidden");
-  $("logoutBtn").classList.add("hidden");
-  $("appLogoutBtn").classList.remove("hidden");
-  $("userInfo").textContent = "";
-  $("promptList").innerHTML = "";
-}
-function setRecoveryUI(enabled){
-  recoveryMode = enabled;
-  $("newPasswordArea").classList.toggle("hidden",!enabled);
-  $("loginPasswordArea").classList.toggle("hidden",enabled);
-  $("authButtons").classList.toggle("hidden",enabled);
-  $("forgotBtn").classList.toggle("hidden",enabled);
-  $("newPasswordButtons").classList.toggle("hidden",!enabled);
-  $("authTitle").textContent = enabled
-    ? "Crear nueva contraseña"
-    : "Iniciar sesión";
-}
-function clearEditor(){
-  editingId = null;
-  $("title").value = "";
-  $("category").value = "";
-  $("content").value = "";
-  $("editorTitle").textContent = "Agregar un prompt";
-  $("saveBtn").textContent = "Guardar prompt";
-  $("cancelEditBtn").classList.add("hidden");
-  appMessage("");
-}
-function storedConfig(){
-  try{
-    return JSON.parse(localStorage.getItem(CONFIG_STORAGE) || "null");
-  }catch{
-    return null;
-  }
-}
-
-async function connect(url,key,save=true){
-  url = url.trim().replace(/\/+$/,"");
-  key = key.trim();
-
-  if(!configIsValid(url,key)){
-    configMessage(
-      "Revisa los datos. Usa la URL base del proyecto, por ejemplo https://tu-proyecto.supabase.co, y la clave pública.",
-      true
-    );
-    return;
+    el.textContent = text || "";
+    el.className = "status" + (text ? " " + type : "");
   }
 
-  if(!window.supabase){
-    configMessage("No se pudo cargar Supabase. Revisa tu conexión a internet.",true);
-    return;
+  function authMessage(text, type = "info") {
+    message("authStatus", text, type);
+  }
+  function configMessage(text, type = "info") {
+    message("configStatus", text, type);
+  }
+  function appMessage(text, type = "info") {
+    message("status", text, type);
+  }
+  function listMessage(text, type = "info") {
+    message("listStatus", text, type);
   }
 
-  setBusy(true);
-  configMessage("Conectando...");
+  function busy(id, value) {
+    const el = $(id);
+    if (!el) return;
+    el.disabled = value;
+  }
 
-  try{
-    supabaseClient = window.supabase.createClient(url,key,{
-      auth:{
-        persistSession:true,
-        autoRefreshToken:true,
-        detectSessionInUrl:true
-      }
-    });
-
-    if(save){
-      localStorage.setItem(CONFIG_STORAGE,JSON.stringify({url,key}));
+  function configIsValid(url, key) {
+    try {
+      const parsed = new URL(url);
+      return (parsed.protocol === "https:" || parsed.hostname === "localhost") &&
+        !!key.trim();
+    } catch (_) {
+      return false;
     }
+  }
 
-    const {data,error} = await supabaseClient.auth.getSession();
-    if(error) throw error;
-
+  function showAuth() {
     $("configPanel").classList.add("hidden");
     $("auth").classList.remove("hidden");
+    $("app").classList.add("hidden");
+  }
 
-    if(data.session){
-      currentUser = data.session.user;
-      showApp();
-      $("userInfo").textContent = "Sesión: " + (currentUser.email || "");
-      await loadPrompts();
-    }else{
-      showLoggedOut();
-      authMessage("Conexión correcta. Inicia sesión o crea una cuenta.");
+  function showApp() {
+    $("configPanel").classList.add("hidden");
+    $("auth").classList.add("hidden");
+    $("app").classList.remove("hidden");
+    $("userInfo").textContent = currentUser?.email || "Cuenta activa";
+  }
+
+  function showLoggedOut() {
+    currentUser = null;
+    prompts = [];
+    editingId = null;
+    $("app").classList.add("hidden");
+    $("auth").classList.remove("hidden");
+    $("promptList").replaceChildren();
+    $("promptCount").textContent = "0 prompts";
+    clearEditor();
+  }
+
+  function setRecoveryUI(active) {
+    recoveryMode = active;
+    $("authTitle").textContent = active ? "Crear nueva contraseña" : "Bienvenido a tu biblioteca";
+    $("loginPasswordArea").classList.toggle("hidden", active);
+    $("newPasswordArea").classList.toggle("hidden", !active);
+    $("authButtons").classList.toggle("hidden", active);
+    $("recoveryButtons").classList.toggle("hidden", active);
+    $("newPasswordButtons").classList.toggle("hidden", !active);
+    if (active) $("newPassword").value = "";
+  }
+
+  function storedConfig() {
+    try {
+      return JSON.parse(localStorage.getItem(CONFIG_KEY) || "null");
+    } catch (_) {
+      return null;
+    }
+  }
+
+  async function connect(url, key, save = true) {
+    if (!configIsValid(url, key)) {
+      configMessage("Revisa la URL y la clave pública de Supabase.", "error");
+      return;
     }
 
-    supabaseClient.auth.onAuthStateChange((event,session) => {
-      if(event === "PASSWORD_RECOVERY"){
+    busy("connectBtn", true);
+    configMessage("Conectando con Supabase...");
+
+    try {
+      if (authSubscription) {
+        authSubscription.unsubscribe();
+        authSubscription = null;
+      }
+
+      supabaseClient = window.supabase.createClient(url.trim(), key.trim(), {
+        auth: {
+          persistSession: true,
+          autoRefreshToken: true,
+          detectSessionInUrl: true
+        }
+      });
+
+      if (save) {
+        localStorage.setItem(CONFIG_KEY, JSON.stringify({
+          url: url.trim(),
+          key: key.trim()
+        }));
+      }
+
+      const { data, error } = await supabaseClient.auth.getSession();
+      if (error) throw error;
+
+      $("configPanel").classList.add("hidden");
+      if (data.session?.user) {
+        currentUser = data.session.user;
+        showApp();
+        await loadPrompts();
+      } else {
+        showAuth();
+      }
+
+      const { data: listener } = supabaseClient.auth.onAuthStateChange(
+        async (event, session) => {
+          if (event === "PASSWORD_RECOVERY") {
+            recoveryReady = true;
+            setRecoveryUI(true);
+            showAuth();
+            authMessage("Enlace verificado. Escribe tu nueva contraseña.", "success");
+          } else if (event === "SIGNED_IN" && session?.user && !recoveryMode) {
+            currentUser = session.user;
+            showApp();
+            setTimeout(() => loadPrompts(), 0);
+          } else if (event === "SIGNED_OUT") {
+            showLoggedOut();
+          } else if (event === "USER_UPDATED" && session?.user) {
+            currentUser = session.user;
+            setRecoveryUI(false);
+            authMessage("Contraseña actualizada correctamente.", "success");
+            showAuth();
+          }
+        }
+      );
+      authSubscription = listener.subscription;
+
+      configMessage("");
+    } catch (error) {
+      configMessage("No se pudo conectar: " + (error.message || "revisa los datos de Supabase."), "error");
+      supabaseClient = null;
+    } finally {
+      busy("connectBtn", false);
+    }
+  }
+
+  async function signIn() {
+    if (!supabaseClient) return authMessage("Primero conecta Supabase.", "error");
+    const email = $("email").value.trim();
+    const password = $("password").value;
+    if (!email || !password) return authMessage("Escribe tu correo y contraseña.", "error");
+
+    busy("loginBtn", true);
+    authMessage("Iniciando sesión...");
+    try {
+      const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+      currentUser = data.user;
+      setRecoveryUI(false);
+      showApp();
+      await loadPrompts();
+      authMessage("");
+    } catch (error) {
+      authMessage(error.message || "No se pudo iniciar sesión.", "error");
+    } finally {
+      busy("loginBtn", false);
+    }
+  }
+
+  async function signUp() {
+    if (!supabaseClient) return authMessage("Primero conecta Supabase.", "error");
+    const email = $("email").value.trim();
+    const password = $("password").value;
+    if (!email || !password) return authMessage("Escribe tu correo y una contraseña.", "error");
+    if (password.length < 6) return authMessage("La contraseña debe tener al menos 6 caracteres.", "error");
+
+    busy("registerBtn", true);
+    authMessage("Creando tu cuenta...");
+    try {
+      const { data, error } = await supabaseClient.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: location.href.split("#")[0]
+        }
+      });
+      if (error) throw error;
+
+      if (data.session) {
+        currentUser = data.user;
+        showApp();
+        await loadPrompts();
+        authMessage("");
+      } else {
+        authMessage("Cuenta creada. Revisa tu correo y confirma el registro antes de iniciar sesión.", "success");
+      }
+    } catch (error) {
+      authMessage(error.message || "No se pudo crear la cuenta.", "error");
+    } finally {
+      busy("registerBtn", false);
+    }
+  }
+
+  async function forgotPassword() {
+    if (!supabaseClient) return authMessage("Primero conecta Supabase.", "error");
+    const email = $("email").value.trim();
+    if (!email) return authMessage("Escribe primero tu correo electrónico.", "error");
+
+    busy("forgotBtn", true);
+    authMessage("Enviando enlace de recuperación...");
+    try {
+      const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+        redirectTo: location.href.split("#")[0]
+      });
+      if (error) throw error;
+      authMessage("Si el correo está registrado, recibirás un enlace. Ábrelo en este mismo navegador donde conectaste Supabase.", "success");
+    } catch (error) {
+      authMessage(error.message || "No se pudo enviar el enlace.", "error");
+    } finally {
+      busy("forgotBtn", false);
+    }
+  }
+
+  async function saveNewPassword() {
+    if (!supabaseClient) return authMessage("No hay conexión con Supabase. Abre la app en el mismo navegador donde la configuraste.", "error");
+
+    const password = $("newPassword").value;
+    if (password.length < 6) {
+      return authMessage("La nueva contraseña debe tener al menos 6 caracteres.", "error");
+    }
+
+    busy("savePasswordBtn", true);
+    authMessage("Actualizando contraseña...");
+    try {
+      const { data: sessionData, error: sessionError } = await supabaseClient.auth.getSession();
+      if (sessionError) throw sessionError;
+
+      if (!sessionData.session && !recoveryReady) {
+        throw new Error("El enlace de recuperación no está activo. Abre nuevamente el enlace más reciente que recibiste por correo.");
+      }
+
+      const { error } = await supabaseClient.auth.updateUser({ password });
+      if (error) throw error;
+
+      recoveryMode = false;
+      recoveryReady = false;
+      $("password").value = "";
+      $("newPassword").value = "";
+      setRecoveryUI(false);
+      authMessage("Contraseña actualizada. Ya puedes iniciar sesión con tu nueva contraseña.", "success");
+
+      await supabaseClient.auth.signOut();
+      showAuth();
+      history.replaceState(null, "", location.pathname + location.search);
+    } catch (error) {
+      authMessage(error.message || "No se pudo actualizar la contraseña.", "error");
+    } finally {
+      busy("savePasswordBtn", false);
+    }
+  }
+
+  async function signOut() {
+    if (!supabaseClient) return;
+    const { error } = await supabaseClient.auth.signOut();
+    if (error) {
+      listMessage("No se pudo cerrar sesión: " + error.message, "error");
+      return;
+    }
+    showLoggedOut();
+    setRecoveryUI(false);
+    authMessage("Sesión cerrada.", "success");
+  }
+
+  function clearEditor() {
+    editingId = null;
+    $("title").value = "";
+    $("category").value = "";
+    $("content").value = "";
+    $("editorTitle").textContent = "Añadir nuevo prompt";
+    $("saveBtn").textContent = "Guardar prompt";
+    $("cancelEditBtn").classList.add("hidden");
+    appMessage("");
+  }
+
+  async function loadPrompts() {
+    if (!supabaseClient || !currentUser) return;
+    listMessage("Cargando tus prompts...");
+    try {
+      const { data, error } = await supabaseClient
+        .from(TABLE)
+        .select("id,title,content,category,created_at,updated_at")
+        .eq("user_id", currentUser.id)
+        .order("updated_at", { ascending: false });
+
+      if (error) throw error;
+      prompts = data || [];
+      refreshCategories();
+      renderPrompts();
+      listMessage(prompts.length ? "" : "Tu biblioteca está lista. Guarda tu primer prompt para comenzar.", "info");
+    } catch (error) {
+      listMessage("No se pudieron cargar los prompts: " + error.message, "error");
+    }
+  }
+
+  function refreshCategories() {
+    const select = $("filterCategory");
+    const previous = select.value;
+    const categories = [...new Set(
+      prompts.map(p => (p.category || "").trim()).filter(Boolean)
+    )].sort((a, b) => a.localeCompare(b, "es"));
+
+    select.replaceChildren(new Option("Todas las categorías", ""));
+    categories.forEach(category => select.add(new Option(category, category)));
+    if (categories.includes(previous)) select.value = previous;
+  }
+
+  function renderPrompts() {
+    const container = $("promptList");
+    container.replaceChildren();
+
+    const query = $("search").value.trim().toLocaleLowerCase("es");
+    const category = $("filterCategory").value;
+    const filtered = prompts.filter(p => {
+      const matchesCategory = !category || (p.category || "").trim() === category;
+      const text = [p.title, p.content, p.category].join(" ").toLocaleLowerCase("es");
+      return matchesCategory && text.includes(query);
+    });
+
+    $("promptCount").textContent = `${filtered.length} ${filtered.length === 1 ? "prompt" : "prompts"}`;
+
+    if (!filtered.length) {
+      const empty = document.createElement("div");
+      empty.className = "empty";
+      const heading = document.createElement("strong");
+      heading.textContent = prompts.length ? "Sin resultados" : "Tu biblioteca comienza aquí";
+      const paragraph = document.createElement("span");
+      paragraph.textContent = prompts.length
+        ? "Prueba con otra búsqueda o categoría."
+        : "Añade tu primer prompt usando el formulario de arriba.";
+      empty.append(heading, paragraph);
+      container.append(empty);
+      return;
+    }
+
+    filtered.forEach(prompt => {
+      const card = document.createElement("article");
+      card.className = "prompt-card";
+
+      const top = document.createElement("div");
+      top.className = "card-top";
+      const title = document.createElement("h3");
+      title.textContent = prompt.title || "Sin título";
+      top.append(title);
+
+      const pill = document.createElement("span");
+      pill.className = "category-pill";
+      pill.textContent = prompt.category || "Sin categoría";
+
+      const preview = document.createElement("p");
+      preview.className = "prompt-preview";
+      preview.textContent = prompt.content || "";
+
+      const actions = document.createElement("div");
+      actions.className = "card-actions";
+
+      const copyBtn = document.createElement("button");
+      copyBtn.className = "btn btn-small btn-secondary";
+      copyBtn.textContent = "Copiar";
+      copyBtn.addEventListener("click", async () => {
+        try {
+          await navigator.clipboard.writeText(prompt.content || "");
+          copyBtn.textContent = "¡Copiado!";
+          setTimeout(() => { copyBtn.textContent = "Copiar"; }, 1600);
+        } catch (_) {
+          const temp = document.createElement("textarea");
+          temp.value = prompt.content || "";
+          document.body.append(temp);
+          temp.select();
+          const ok = document.execCommand("copy");
+          temp.remove();
+          copyBtn.textContent = ok ? "¡Copiado!" : "Selecciona y copia";
+          setTimeout(() => { copyBtn.textContent = "Copiar"; }, 1600);
+        }
+      });
+
+      const editBtn = document.createElement("button");
+      editBtn.className = "btn btn-small";
+      editBtn.textContent = "Editar";
+      editBtn.addEventListener("click", () => editPrompt(prompt.id));
+
+      const deleteBtn = document.createElement("button");
+      deleteBtn.className = "btn btn-small btn-danger";
+      deleteBtn.textContent = "Eliminar";
+      deleteBtn.addEventListener("click", () => deletePrompt(prompt.id));
+
+      actions.append(copyBtn, editBtn, deleteBtn);
+      card.append(top, pill, preview, actions);
+      container.append(card);
+    });
+  }
+
+  function editPrompt(id) {
+    const prompt = prompts.find(p => String(p.id) === String(id));
+    if (!prompt) return;
+    editingId = prompt.id;
+    $("title").value = prompt.title || "";
+    $("category").value = prompt.category || "";
+    $("content").value = prompt.content || "";
+    $("editorTitle").textContent = "Editar prompt";
+    $("saveBtn").textContent = "Guardar cambios";
+    $("cancelEditBtn").classList.remove("hidden");
+    appMessage("");
+    $("editor").scrollIntoView({ behavior: "smooth", block: "start" });
+    setTimeout(() => $("title").focus({ preventScroll: true }), 350);
+  }
+
+  async function savePrompt() {
+    if (!supabaseClient || !currentUser) return appMessage("Inicia sesión para guardar prompts.", "error");
+
+    const title = $("title").value.trim();
+    const category = $("category").value.trim();
+    const content = $("content").value.trim();
+
+    if (!title || !content) {
+      return appMessage("El título y el contenido del prompt son obligatorios.", "error");
+    }
+
+    busy("saveBtn", true);
+    appMessage(editingId ? "Guardando cambios..." : "Guardando prompt...");
+    try {
+      const payload = {
+        user_id: currentUser.id,
+        title,
+        content,
+        category,
+        updated_at: new Date().toISOString()
+      };
+
+      let result;
+      if (editingId) {
+        result = await supabaseClient
+          .from(TABLE)
+          .update(payload)
+          .eq("id", editingId)
+          .eq("user_id", currentUser.id);
+      } else {
+        result = await supabaseClient.from(TABLE).insert(payload);
+      }
+
+      if (result.error) throw result.error;
+      clearEditor();
+      appMessage("Prompt guardado correctamente.", "success");
+      await loadPrompts();
+    } catch (error) {
+      appMessage("No se pudo guardar: " + error.message, "error");
+    } finally {
+      busy("saveBtn", false);
+    }
+  }
+
+  async function deletePrompt(id) {
+    const prompt = prompts.find(p => String(p.id) === String(id));
+    if (!prompt) return;
+    if (!confirm(`¿Eliminar el prompt "${prompt.title}"? Esta acción no se puede deshacer.`)) return;
+
+    listMessage("Eliminando prompt...");
+    try {
+      const { error } = await supabaseClient
+        .from(TABLE)
+        .delete()
+        .eq("id", id)
+        .eq("user_id", currentUser.id);
+
+      if (error) throw error;
+      if (String(editingId) === String(id)) clearEditor();
+      await loadPrompts();
+      listMessage("Prompt eliminado.", "success");
+    } catch (error) {
+      listMessage("No se pudo eliminar: " + error.message, "error");
+    }
+  }
+
+  $("connectBtn").addEventListener("click", () => {
+    connect($("projectUrl").value.trim(), $("publicKey").value.trim());
+  });
+
+  $("forgetConfigBtn").addEventListener("click", () => {
+    if (!confirm("¿Borrar la configuración de Supabase guardada en este navegador?")) return;
+    localStorage.removeItem(CONFIG_KEY);
+    $("projectUrl").value = "";
+    $("publicKey").value = "";
+    configMessage("Configuración borrada de este navegador.", "success");
+  });
+
+  $("loginBtn").addEventListener("click", signIn);
+  $("registerBtn").addEventListener("click", signUp);
+  $("forgotBtn").addEventListener("click", forgotPassword);
+  $("savePasswordBtn").addEventListener("click", saveNewPassword);
+  $("cancelRecoveryBtn").addEventListener("click", () => {
+    recoveryMode = false;
+    recoveryReady = false;
+    setRecoveryUI(false);
+    authMessage("Puedes iniciar sesión con tu contraseña actual.");
+    history.replaceState(null, "", location.pathname + location.search);
+  });
+
+  $("logoutBtn")?.addEventListener("click", signOut);
+  $("appLogoutBtn").addEventListener("click", signOut);
+  $("refreshBtn").addEventListener("click", loadPrompts);
+  $("saveBtn").addEventListener("click", savePrompt);
+  $("clearBtn").addEventListener("click", clearEditor);
+  $("cancelEditBtn").addEventListener("click", clearEditor);
+  $("search").addEventListener("input", renderPrompts);
+  $("filterCategory").addEventListener("change", renderPrompts);
+
+  $("password").addEventListener("keydown", event => {
+    if (event.key === "Enter") signIn();
+  });
+  $("newPassword").addEventListener("keydown", event => {
+    if (event.key === "Enter") saveNewPassword();
+  });
+
+  (async function init() {
+    const hash = new URLSearchParams(location.hash.slice(1));
+    const search = new URLSearchParams(location.search);
+    const isRecovery = hash.get("type") === "recovery" || search.get("type") === "recovery";
+
+    if (isRecovery) {
+      setRecoveryUI(true);
+      authMessage("Verificando el enlace de recuperación...", "info");
+    }
+
+    const config = storedConfig();
+    if (config?.url && config?.key) {
+      $("projectUrl").value = config.url;
+      $("publicKey").value = config.key;
+      await connect(config.url, config.key, false);
+
+      if (isRecovery) {
         setRecoveryUI(true);
         showAuth();
-        authMessage("Escribe la nueva contraseña y pulsa Guardar nueva contraseña.");
-        return;
       }
-
-      if(session && !recoveryMode){
-        currentUser = session.user;
-        showApp();
-        $("userInfo").textContent = "Sesión: " + (currentUser.email || "");
-        // La carga de datos se realiza desde los botones y el flujo de conexión.
-      }else if(!session && event === "SIGNED_OUT"){
-        showLoggedOut();
-        setRecoveryUI(false);
-        authMessage("Has cerrado sesión.");
+    } else {
+      configMessage("Conecta tu proyecto Supabase para continuar.");
+      if (isRecovery) {
+        authMessage("Para restablecer la contraseña, abre este enlace en el mismo navegador donde configuraste Supabase. Si borraste la configuración, tendrás que conectarlo nuevamente.", "info");
       }
-    });
-
-    configMessage("");
-  }catch(e){
-    supabaseClient = null;
-    configMessage("Error de conexión: " + (e.message || e),true);
-  }finally{
-    setBusy(false);
-  }
-}
-
-async function signIn(){
-  if(busy || !supabaseClient) return;
-  const email = $("email").value.trim();
-  const password = $("password").value;
-
-  if(!email || !password){
-    authMessage("Escribe tu correo y contraseña.",true);
-    return;
-  }
-
-  setBusy(true);
-  authMessage("Iniciando sesión...");
-
-  try{
-    const {data,error} = await supabaseClient.auth.signInWithPassword({
-      email,password
-    });
-    if(error) throw error;
-
-    currentUser = data.user;
-    setRecoveryUI(false);
-    showApp();
-    $("userInfo").textContent = "Sesión: " + (currentUser.email || "");
-    authMessage("");
-    await loadPrompts();
-  }catch(e){
-    authMessage("No se pudo iniciar sesión: " + e.message,true);
-  }finally{
-    setBusy(false);
-  }
-}
-
-async function signUp(){
-  if(busy || !supabaseClient) return;
-  const email = $("email").value.trim();
-  const password = $("password").value;
-
-  if(!email || !password){
-    authMessage("Escribe tu correo y una contraseña.",true);
-    return;
-  }
-  if(password.length < 6){
-    authMessage("La contraseña debe tener al menos 6 caracteres.",true);
-    return;
-  }
-
-  setBusy(true);
-  authMessage("Creando cuenta...");
-
-  try{
-    const {data,error} = await supabaseClient.auth.signUp({
-      email,
-      password,
-      options:{emailRedirectTo:location.href.split("#")[0]}
-    });
-    if(error) throw error;
-
-    if(data.session){
-      currentUser = data.user;
-      showApp();
-      $("userInfo").textContent = "Sesión: " + (currentUser.email || "");
-      authMessage("Cuenta creada correctamente.");
-      await loadPrompts();
-    }else{
-      authMessage("Registro enviado. Revisa tu correo para confirmar la cuenta antes de iniciar sesión.");
     }
-  }catch(e){
-    authMessage("No se pudo crear la cuenta: " + e.message,true);
-  }finally{
-    setBusy(false);
-  }
-}
-
-async function forgotPassword(){
-  if(busy || !supabaseClient) return;
-  const email = $("email").value.trim();
-
-  if(!email){
-    authMessage("Primero escribe tu correo electrónico.",true);
-    return;
-  }
-
-  setBusy(true);
-  authMessage("Enviando solicitud...");
-
-  try{
-    const {error} = await supabaseClient.auth.resetPasswordForEmail(email,{
-      redirectTo:location.href.split("#")[0]
-    });
-    if(error) throw error;
-
-    authMessage("Solicitud enviada. Revisa tu correo y abre el enlace de recuperación. Después escribe la nueva contraseña aquí.");
-  }catch(e){
-    authMessage("No se pudo enviar el correo: " + e.message,true);
-  }finally{
-    setBusy(false);
-  }
-}
-
-async function saveNewPassword(){
-  if(busy || !supabaseClient) return;
-  const password = $("newPassword").value;
-
-  if(password.length < 6){
-    authMessage("La nueva contraseña debe tener al menos 6 caracteres.",true);
-    return;
-  }
-
-  setBusy(true);
-  authMessage("Actualizando contraseña...");
-
-  try{
-    const {error} = await supabaseClient.auth.updateUser({password});
-    if(error) throw error;
-
-    $("newPassword").value = "";
-    setRecoveryUI(false);
-    authMessage("Contraseña actualizada. Ahora puedes iniciar sesión con tu nueva contraseña.");
-
-    await supabaseClient.auth.signOut();
-    showLoggedOut();
-    authMessage("Contraseña actualizada. Inicia sesión con tu nueva contraseña.");
-  }catch(e){
-    authMessage("No se pudo cambiar la contraseña: " + e.message,true);
-  }finally{
-    setBusy(false);
-  }
-}
-
-async function signOut(){
-  if(!supabaseClient) return;
-  const {error} = await supabaseClient.auth.signOut();
-  if(error){
-    authMessage("No se pudo cerrar sesión: " + error.message,true);
-    return;
-  }
-  showLoggedOut();
-  setRecoveryUI(false);
-  authMessage("Sesión cerrada.");
-}
-
-async function loadPrompts(){
-  if(!supabaseClient || !currentUser) return;
-  listMessage("Cargando prompts...");
-
-  try{
-    const {data,error} = await supabaseClient
-      .from(TABLE)
-      .select("id,title,content,category,created_at,updated_at")
-      .eq("user_id",currentUser.id)
-      .order("created_at",{ascending:false});
-
-    if(error) throw error;
-    prompts = data || [];
-    renderPrompts();
-    listMessage(prompts.length ? "" : "Todavía no tienes prompts guardados.");
-    refreshCategories();
-  }catch(e){
-    listMessage("No se pudieron cargar los prompts: " + e.message,true);
-  }
-}
-
-function refreshCategories(){
-  const select = $("filterCategory");
-  const previous = select.value;
-  const categories = [...new Set(
-    prompts.map(p => (p.category || "").trim()).filter(Boolean)
-  )].sort((a,b)=>a.localeCompare(b,"es"));
-
-  select.innerHTML = "";
-  const all = document.createElement("option");
-  all.value = "";
-  all.textContent = "Todas las categorías";
-  select.appendChild(all);
-
-  categories.forEach(category=>{
-    const option = document.createElement("option");
-    option.value = category;
-    option.textContent = category;
-    select.appendChild(option);
-  });
-
-  select.value = categories.includes(previous) ? previous : "";
-}
-
-function renderPrompts(){
-  const query = $("search").value.trim().toLocaleLowerCase("es");
-  const category = $("filterCategory").value;
-  const list = $("promptList");
-  list.innerHTML = "";
-
-  const filtered = prompts.filter(p=>{
-    const matchesCategory = !category || (p.category || "") === category;
-    const text = [p.title,p.content,p.category].join(" ").toLocaleLowerCase("es");
-    return matchesCategory && text.includes(query);
-  });
-
-  if(!filtered.length){
-    const empty = document.createElement("div");
-    empty.className = "empty";
-    empty.textContent = prompts.length
-      ? "No hay resultados con esos filtros."
-      : "Tus prompts guardados aparecerán aquí.";
-    list.appendChild(empty);
-    return;
-  }
-
-  filtered.forEach(p=>{
-    const card = document.createElement("article");
-    card.className = "prompt-card";
-
-    const meta = document.createElement("div");
-    meta.className = "prompt-meta";
-    meta.textContent = p.category || "Sin categoría";
-
-    const heading = document.createElement("h3");
-    heading.textContent = p.title || "Sin título";
-
-    const content = document.createElement("div");
-    content.className = "prompt-content";
-    content.textContent = p.content || "";
-
-    const actions = document.createElement("div");
-    actions.className = "actions";
-
-    const copyBtn = document.createElement("button");
-    copyBtn.className = "secondary";
-    copyBtn.textContent = "Copiar";
-    copyBtn.onclick = async()=>{
-      try{
-        await navigator.clipboard.writeText(p.content || "");
-        appMessage("Prompt copiado.");
-      }catch{
-        appMessage("No se pudo copiar automáticamente. Selecciona y copia el texto.",true);
-      }
-    };
-
-    const editBtn = document.createElement("button");
-    editBtn.className = "secondary";
-    editBtn.textContent = "Editar";
-    editBtn.onclick = ()=>editPrompt(p.id);
-
-    const deleteBtn = document.createElement("button");
-    deleteBtn.className = "danger";
-    deleteBtn.textContent = "Eliminar";
-    deleteBtn.onclick = ()=>deletePrompt(p.id);
-
-    actions.append(copyBtn,editBtn,deleteBtn);
-    card.append(meta,heading,content,actions);
-    list.appendChild(card);
-  });
-}
-
-function editPrompt(id){
-  const p = prompts.find(item => String(item.id) === String(id));
-  if(!p) return;
-
-  editingId = p.id;
-  $("title").value = p.title || "";
-  $("category").value = p.category || "";
-  $("content").value = p.content || "";
-  $("editorTitle").textContent = "Editar prompt";
-  $("saveBtn").textContent = "Guardar cambios";
-  $("cancelEditBtn").classList.remove("hidden");
-  appMessage("");
-  $("editor").scrollIntoView({behavior:"smooth",block:"start"});
-}
-
-async function savePrompt(){
-  if(busy || !supabaseClient || !currentUser) return;
-
-  const title = $("title").value.trim();
-  const category = $("category").value.trim();
-  const content = $("content").value.trim();
-
-  if(!title || !content){
-    appMessage("El título y el contenido del prompt son obligatorios.",true);
-    return;
-  }
-
-  setBusy(true);
-  appMessage("Guardando...");
-
-  try{
-    const payload = {
-      title,
-      content,
-      category:category || "Sin categoría",
-      user_id:currentUser.id,
-      updated_at:new Date().toISOString()
-    };
-
-    let result;
-    if(editingId !== null){
-      result = await supabaseClient
-        .from(TABLE)
-        .update(payload)
-        .eq("id",editingId)
-        .eq("user_id",currentUser.id);
-    }else{
-      result = await supabaseClient.from(TABLE).insert(payload);
-    }
-
-    if(result.error) throw result.error;
-
-    clearEditor();
-    appMessage("Prompt guardado correctamente.");
-    await loadPrompts();
-  }catch(e){
-    appMessage("No se pudo guardar: " + e.message,true);
-  }finally{
-    setBusy(false);
-  }
-}
-
-async function deletePrompt(id){
-  if(!supabaseClient || !currentUser) return;
-  if(!confirm("¿Seguro que quieres eliminar este prompt?")) return;
-
-  listMessage("Eliminando...");
-  try{
-    const {error} = await supabaseClient
-      .from(TABLE)
-      .delete()
-      .eq("id",id)
-      .eq("user_id",currentUser.id);
-
-    if(error) throw error;
-    appMessage("Prompt eliminado.");
-    await loadPrompts();
-  }catch(e){
-    listMessage("No se pudo eliminar: " + e.message,true);
-  }
-}
-
-$("connectBtn").addEventListener("click",()=>{
-  connect($("projectUrl").value,$("publicKey").value,true);
-});
-$("forgetConfigBtn").addEventListener("click",()=>{
-  if(!confirm("¿Borrar la configuración de Supabase guardada en este dispositivo?")) return;
-  localStorage.removeItem(CONFIG_STORAGE);
-  $("projectUrl").value = "";
-  $("publicKey").value = "";
-  configMessage("Configuración borrada.");
-  supabaseClient = null;
-  $("auth").classList.add("hidden");
-  $("app").classList.add("hidden");
-  $("configPanel").classList.remove("hidden");
-});
-$("loginBtn").addEventListener("click",signIn);
-$("registerBtn").addEventListener("click",signUp);
-$("forgotBtn").addEventListener("click",forgotPassword);
-$("savePasswordBtn").addEventListener("click",saveNewPassword);
-$("cancelRecoveryBtn").addEventListener("click",()=>{
-  setRecoveryUI(false);
-  authMessage("Puedes iniciar sesión o solicitar otro enlace de recuperación.");
-});
-$("logoutBtn").addEventListener("click",signOut);
-$("appLogoutBtn").addEventListener("click",signOut);
-$("saveBtn").addEventListener("click",savePrompt);
-$("clearBtn").addEventListener("click",clearEditor);
-$("cancelEditBtn").addEventListener("click",clearEditor);
-$("refreshBtn").addEventListener("click",loadPrompts);
-$("search").addEventListener("input",renderPrompts);
-$("filterCategory").addEventListener("change",renderPrompts);
-
-(async function init(){
-  // Detecta un enlace de recuperación abierto desde el correo.
-  const hash = new URLSearchParams(location.hash.replace(/^#/,""));
-  if(hash.get("type") === "recovery"){
-    setRecoveryUI(true);
-  }
-
-  const config = storedConfig();
-  if(config){
-    $("projectUrl").value = config.url || "";
-    $("publicKey").value = config.key || "";
-    await connect(config.url || "",config.key || "",false);
-    if(hash.get("type") === "recovery"){
-      setRecoveryUI(true);
-      showAuth();
-      authMessage("Escribe tu nueva contraseña.");
-    }
-  }
+  })();
 })();
 </script>
 </body>
