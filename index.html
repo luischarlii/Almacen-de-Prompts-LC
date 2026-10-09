@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -130,7 +128,8 @@ async function connect(url,key,save=true){
   if(error)throw error;
   user=data.session?.user||null;
   await refreshAuth();
- }catch(e){show("config",true);message("Error: "+e.message)}
+ }
+catch(e){show("config",true);alert("Error de conexión: "+e.message);message("Error: "+e.message)}
 }
 async function refreshAuth(){
  const {data,error}=await db.auth.getSession();
