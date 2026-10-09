@@ -4,348 +4,171 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#0b0b0d">
+<meta name="theme-color" content="#0a0a0c">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <title>Almacén de Prompts LC</title>
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <style>
 :root {
   color-scheme: dark;
-  --bg: #0b0b0d;
-  --panel: #141417;
-  --panel2: #1b1b20;
-  --gold: #d9b56d;
-  --gold2: #f2d99c;
-  --text: #f5f1e8;
-  --muted: #9998a1;
-  --line: #303036;
-  --danger: #ff7777;
-  --radius: 20px;
+  --bg:#0a0a0c;
+  --panel:#141417;
+  --panel2:#1b1b20;
+  --gold:#d6b36a;
+  --gold-light:#f3dfaa;
+  --text:#f6f2e9;
+  --muted:#9b99a2;
+  --line:#323137;
+  --danger:#ff8585;
+  --success:#9fe0b0;
+  --radius:22px;
 }
-* { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
-body {
-  margin: 0;
-  min-height: 100vh;
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  min-height:100vh;
+  color:var(--text);
   background:
-    radial-gradient(ellipse at 50% -15%, rgba(217,181,109,.13), transparent 45%),
+    radial-gradient(ellipse at 50% -15%,#b58b371c,transparent 48%),
     var(--bg);
-  color: var(--text);
-  font-family: "DM Sans", sans-serif;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 }
-button, input, textarea, select { font: inherit; }
-button { cursor: pointer; }
-button:disabled { opacity: .55; cursor: wait; }
-button:focus-visible, input:focus-visible, textarea:focus-visible,
-select:focus-visible {
-  outline: 2px solid var(--gold);
-  outline-offset: 3px;
+button,input,textarea,select{font:inherit}
+button{cursor:pointer}
+button:disabled{opacity:.55;cursor:wait}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{
+  outline:2px solid var(--gold);outline-offset:3px
 }
-.shell {
-  width: min(100% - 28px, 1000px);
-  margin: auto;
-  padding: 24px 0 48px;
+.hidden{display:none!important}
+.shell{width:min(100% - 28px,1040px);margin:auto;padding:22px 0 42px}
+.topbar{display:flex;align-items:center;gap:14px;margin-bottom:28px}
+.logo{
+  width:58px;height:58px;flex:0 0 58px;
+  display:grid;place-items:center;
+  border:1px solid #cba75c;
+  border-radius:18px;
+  background:linear-gradient(145deg,#302514,#111113 70%);
+  box-shadow:0 0 32px #d6b36a12,inset 0 0 18px #d6b36a0c;
+  color:var(--gold-light);
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:25px;font-weight:bold;font-style:italic;
+  letter-spacing:-4px;padding-right:4px
 }
-.topbar {
-  display: flex;
-  align-items: center;
-  gap: 13px;
-  margin-bottom: 30px;
+.brand-name{margin:0;font-family:Georgia,"Times New Roman",serif;font-size:clamp(20px,4.5vw,29px);font-weight:600;line-height:1.2}
+.brand-name span{color:var(--gold)}
+.brand-sub{margin:6px 0 0;color:var(--muted);font-size:10px;letter-spacing:2px;text-transform:uppercase}
+.hero{
+  position:relative;overflow:hidden;
+  padding:28px 24px;margin-bottom:20px;
+  border:1px solid #4a3a21;border-radius:26px;
+  background:linear-gradient(125deg,#251e12,#171518 62%,#101012)
 }
-.logo {
-  width: 54px;
-  height: 54px;
-  flex: 0 0 54px;
-  display: grid;
-  place-items: center;
-  border: 1px solid rgba(217,181,109,.8);
-  border-radius: 17px;
-  background: linear-gradient(145deg,#282116,#111);
-  box-shadow: 0 0 28px rgba(217,181,109,.08), inset 0 0 18px #d9b56d0b;
-  color: var(--gold2);
-  font-family: "Playfair Display", serif;
-  font-size: 24px;
-  font-weight: 700;
-  letter-spacing: -3px;
-  padding-right: 3px;
+.hero:after{
+  content:"LC";position:absolute;right:5px;bottom:-36px;
+  color:#d6b36a0a;font-family:Georgia,serif;font-style:italic;
+  font-size:clamp(100px,24vw,180px);font-weight:bold;pointer-events:none
 }
-.brand-name {
-  margin: 0;
-  font-family: "Playfair Display", serif;
-  font-size: clamp(20px, 4vw, 27px);
-  line-height: 1.2;
+.eyebrow{color:var(--gold);font-size:10px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase}
+.hero h2{
+  position:relative;z-index:1;margin:12px 0;
+  max-width:620px;font-family:Georgia,"Times New Roman",serif;
+  font-size:clamp(29px,6.8vw,44px);font-weight:500;line-height:1.12
 }
-.brand-name span { color: var(--gold); }
-.brand-sub {
-  margin: 5px 0 0;
-  color: var(--muted);
-  font-size: 11px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
+.hero p{position:relative;z-index:1;max-width:540px;margin:0;color:#c0b9ac;font-size:13px;line-height:1.8}
+.panel{
+  padding:22px;margin-bottom:18px;
+  border:1px solid var(--line);border-radius:var(--radius);
+  background:linear-gradient(155deg,#1a191d,#111114);
+  box-shadow:0 14px 35px #00000019
 }
-.hero {
-  padding: 25px 22px;
-  margin-bottom: 20px;
-  border: 1px solid #3b3223;
-  border-radius: 24px;
-  background: linear-gradient(125deg, #211b12, #151417 62%, #101012);
-  position: relative;
-  overflow: hidden;
+.panel-heading{margin:8px 0;font-family:Georgia,"Times New Roman",serif;font-size:25px;font-weight:500}
+.subheading{margin:0 0 20px;color:var(--muted);font-size:12px;line-height:1.7}
+label{display:block;margin:15px 0 8px;color:#d9d4c9;font-size:12px;font-weight:600}
+input,textarea,select{
+  display:block;width:100%;min-width:0;
+  border:1px solid #38363e;border-radius:13px;
+  padding:14px;background:#0c0c0f;color:var(--text);font-size:14px
 }
-.hero:after {
-  content: "LC";
-  position: absolute;
-  right: -5px;
-  bottom: -35px;
-  color: #d9b56d09;
-  font-family: "Playfair Display", serif;
-  font-size: 155px;
-  font-weight: 700;
-  pointer-events: none;
+input::placeholder,textarea::placeholder{color:#6e6b76}
+input:focus,textarea:focus,select:focus{border-color:#a7894e}
+textarea{min-height:175px;resize:vertical;line-height:1.7}
+.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:17px}
+.btn{
+  min-height:43px;padding:12px 16px;
+  border:1px solid #46434b;border-radius:12px;
+  background:#242228;color:var(--text);
+  font-size:12px;font-weight:700;
+  transition:transform .15s,border-color .15s
 }
-.eyebrow {
-  color: var(--gold);
-  text-transform: uppercase;
-  font-size: 10px;
-  letter-spacing: 2.5px;
-  font-weight: 700;
+.btn:active{transform:scale(.98)}
+.btn-primary{
+  color:#17120a;border-color:#d6b36a;
+  background:linear-gradient(135deg,#f3dfaa,#c59b4b)
 }
-.hero h2 {
-  position: relative;
-  z-index: 1;
-  margin: 10px 0;
-  max-width: 580px;
-  font-family: "Playfair Display", serif;
-  font-size: clamp(27px, 6vw, 40px);
-  line-height: 1.14;
-  font-weight: 600;
+.btn-primary:hover{background:#f6e4b8}
+.btn-secondary{background:#17171b}
+.btn-danger{color:#ffaaaa;border-color:#69383d;background:#321a1f}
+.btn-small{min-height:35px;padding:8px 11px;font-size:11px}
+.status{margin-top:13px;font-size:12px;line-height:1.65;overflow-wrap:anywhere}
+.status:empty{display:none}
+.status.error{color:var(--danger)}
+.status.success{color:var(--success)}
+.status.info{color:var(--gold-light)}
+.section-title{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:27px 0 15px}
+.section-title h2{margin:0;font-family:Georgia,"Times New Roman",serif;font-size:25px;font-weight:500}
+.count{
+  flex-shrink:0;padding:6px 10px;border:1px solid #5c492b;
+  border-radius:100px;color:var(--gold-light);font-size:11px
 }
-.hero p {
-  position: relative;
-  z-index: 1;
-  max-width: 520px;
-  color: #b6b2aa;
-  font-size: 13px;
-  line-height: 1.7;
-  margin: 0;
+.toolbar{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(130px,.8fr);gap:10px;margin-bottom:15px}
+.prompt-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}
+.prompt-card{
+  display:flex;flex-direction:column;min-width:0;
+  padding:19px;border:1px solid #343238;border-radius:19px;
+  background:linear-gradient(155deg,#1c1b20,#121215);
+  transition:border-color .2s,transform .2s
 }
-.panel {
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  background: linear-gradient(155deg, #19191d, #111114);
-  padding: 20px;
-  margin-bottom: 18px;
-  box-shadow: 0 12px 35px #00000017;
+.prompt-card:hover{border-color:#77603a;transform:translateY(-2px)}
+.prompt-card h3{margin:0 0 12px;font-size:16px;line-height:1.5;overflow-wrap:anywhere}
+.category-pill{
+  display:inline-block;width:fit-content;max-width:100%;
+  margin-bottom:14px;padding:6px 10px;
+  border:1px solid #5a492d;border-radius:100px;
+  color:var(--gold-light);background:#d6b36a0d;
+  font-size:10px;overflow-wrap:anywhere
 }
-.panel-heading {
-  margin: 0 0 6px;
-  font-family: "Playfair Display", serif;
-  font-size: 22px;
+.prompt-preview{
+  display:-webkit-box;-webkit-line-clamp:6;-webkit-box-orient:vertical;
+  overflow:hidden;white-space:pre-wrap;overflow-wrap:anywhere;
+  margin:0 0 18px;color:#bcb9c2;font-size:12px;line-height:1.8
 }
-.subheading {
-  color: var(--muted);
-  font-size: 12px;
-  line-height: 1.6;
-  margin: 0 0 18px;
+.card-actions{display:flex;flex-wrap:wrap;gap:7px;margin-top:auto;padding-top:13px;border-top:1px solid #302e34}
+.card-actions .btn{flex:1}
+.empty{
+  grid-column:1/-1;padding:38px 20px;text-align:center;
+  border:1px dashed #45414a;border-radius:18px;
+  color:var(--muted);font-size:13px;line-height:1.8
 }
-label {
-  display: block;
-  margin: 14px 0 7px;
-  color: #d8d4ca;
-  font-size: 12px;
-  font-weight: 600;
+.empty strong{display:block;margin-bottom:7px;color:var(--gold-light);font-family:Georgia,serif;font-size:21px}
+.editor{scroll-margin-top:18px}
+.footer{padding:27px 0 0;text-align:center;color:#73717a;font-size:10px;letter-spacing:1.4px}
+.footer span{color:var(--gold)}
+@media(max-width:620px){
+  .shell{width:min(100% - 22px,1040px);padding-top:16px}
+  .topbar{gap:11px;margin-bottom:21px}
+  .logo{width:49px;height:49px;flex-basis:49px;border-radius:15px;font-size:22px}
+  .brand-sub{font-size:9px;letter-spacing:1.3px}
+  .hero{padding:23px 18px}
+  .panel{padding:18px}
+  .prompt-list{grid-template-columns:1fr}
+  .toolbar{grid-template-columns:1fr}
+  .actions .btn{flex:1 1 auto}
 }
-input, textarea, select {
-  width: 100%;
-  border: 1px solid #37373e;
-  border-radius: 12px;
-  padding: 13px 14px;
-  background: #0d0d10;
-  color: var(--text);
-  font-size: 14px;
-  min-width: 0;
-}
-input::placeholder, textarea::placeholder { color: #696872; }
-textarea { min-height: 150px; resize: vertical; line-height: 1.65; }
-select { appearance: auto; }
-.actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 16px;
-}
-.btn {
-  border: 1px solid #45434a;
-  border-radius: 12px;
-  padding: 12px 16px;
-  background: #222126;
-  color: var(--text);
-  font-size: 13px;
-  font-weight: 700;
-  transition: transform .15s, background .15s;
-}
-.btn:active { transform: scale(.98); }
-.btn-primary {
-  color: #17130c;
-  border-color: var(--gold);
-  background: linear-gradient(135deg, var(--gold2), #c59b4c);
-}
-.btn-primary:hover { background: #f4dba1; }
-.btn-secondary { background: transparent; }
-.btn-danger {
-  color: #ffaaaa;
-  border-color: #673b40;
-  background: #321b20;
-}
-.btn-small { padding: 8px 11px; font-size: 11px; }
-.status {
-  margin-top: 13px;
-  font-size: 12px;
-  line-height: 1.6;
-  overflow-wrap: anywhere;
-}
-.status:empty { display: none; }
-.status.error { color: var(--danger); }
-.status.success { color: #a7ddb2; }
-.status.info { color: var(--gold2); }
-.hidden { display: none !important; }
-.section-title {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin: 26px 0 14px;
-}
-.section-title h2 {
-  margin: 0;
-  font-family: "Playfair Display", serif;
-  font-size: 24px;
-}
-.count {
-  color: var(--gold);
-  font-size: 12px;
-  border: 1px solid #59482d;
-  border-radius: 100px;
-  padding: 5px 10px;
-  white-space: nowrap;
-}
-.toolbar {
-  display: grid;
-  grid-template-columns: minmax(0, 1.5fr) minmax(120px, .8fr);
-  gap: 10px;
-  margin-bottom: 14px;
-}
-.prompt-list {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
-}
-.prompt-card {
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  border: 1px solid #343238;
-  border-radius: 18px;
-  background: linear-gradient(155deg, #1b1a1e, #121215);
-  padding: 17px;
-  transition: border-color .2s, transform .2s;
-}
-.prompt-card:hover {
-  border-color: #77603a;
-  transform: translateY(-2px);
-}
-.card-top {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 8px;
-}
-.prompt-card h3 {
-  font-size: 16px;
-  line-height: 1.4;
-  margin: 0 0 10px;
-  overflow-wrap: anywhere;
-}
-.category-pill {
-  display: inline-block;
-  width: fit-content;
-  max-width: 100%;
-  margin-bottom: 12px;
-  border: 1px solid #5b492d;
-  border-radius: 100px;
-  padding: 5px 9px;
-  color: var(--gold2);
-  background: #d9b56d0c;
-  font-size: 10px;
-  overflow-wrap: anywhere;
-}
-.prompt-preview {
-  color: #b9b7c0;
-  font-size: 12px;
-  line-height: 1.7;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-  display: -webkit-box;
-  -webkit-line-clamp: 5;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  margin: 0 0 17px;
-}
-.card-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 7px;
-  margin-top: auto;
-  padding-top: 12px;
-  border-top: 1px solid #2d2c31;
-}
-.card-actions .btn { flex: 1; }
-.empty {
-  grid-column: 1 / -1;
-  padding: 35px 18px;
-  text-align: center;
-  border: 1px dashed #45414a;
-  border-radius: 18px;
-  color: var(--muted);
-  font-size: 13px;
-  line-height: 1.7;
-}
-.empty strong {
-  display: block;
-  color: var(--gold2);
-  font-family: "Playfair Display", serif;
-  font-size: 20px;
-  margin-bottom: 7px;
-}
-.editor { scroll-margin-top: 18px; }
-.footer {
-  padding: 25px 0 0;
-  text-align: center;
-  color: #74727a;
-  font-size: 10px;
-  letter-spacing: 1px;
-}
-.footer span { color: var(--gold); }
-@media (max-width: 600px) {
-  .shell { width: min(100% - 22px, 1000px); padding-top: 17px; }
-  .topbar { margin-bottom: 22px; }
-  .logo { width: 48px; height: 48px; flex-basis: 48px; }
-  .brand-sub { font-size: 9px; letter-spacing: 1.5px; }
-  .hero { padding: 22px 18px; }
-  .panel { padding: 17px; }
-  .prompt-list { grid-template-columns: 1fr; }
-  .toolbar { grid-template-columns: 1fr; }
-  .actions .btn { flex: 1 1 auto; }
-}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
 </style>
 </head>
-
 <body>
 <div class="shell">
   <header class="topbar">
@@ -358,28 +181,29 @@ select { appearance: auto; }
 
   <section class="hero">
     <div class="eyebrow">Tu biblioteca creativa</div>
-    <h2>Las mejores ideas<br>merecen un gran lugar.</h2>
-    <p>Guarda, organiza y encuentra tus prompts favoritos para inteligencia artificial desde un solo espacio.</p>
+    <h2>Las grandes ideas<br>merecen su espacio.</h2>
+    <p>Organiza tus prompts, encuentra inspiración y guarda tus mejores creaciones en tu biblioteca personal.</p>
   </section>
 
   <section id="configPanel" class="panel">
-    <h2 class="panel-heading">Conectar tu biblioteca</h2>
-    <p class="subheading">Introduce la URL de tu proyecto Supabase y tu clave pública para conectar tu cuenta.</p>
+    <div class="eyebrow">Configuración inicial</div>
+    <h2 class="panel-heading">Conecta tu biblioteca</h2>
+    <p class="subheading">Introduce la URL de tu proyecto Supabase y tu clave pública para acceder a tus datos.</p>
     <label for="projectUrl">URL del proyecto Supabase</label>
     <input id="projectUrl" type="url" placeholder="https://tu-proyecto.supabase.co" autocomplete="url">
     <label for="publicKey">Clave pública (anon / publishable)</label>
     <input id="publicKey" type="password" placeholder="Pega aquí tu clave pública" autocomplete="off">
     <div class="actions">
-      <button id="connectBtn" class="btn btn-primary">Conectar biblioteca</button>
-      <button id="forgetConfigBtn" class="btn btn-secondary" type="button">Borrar configuración guardada</button>
+      <button id="connectBtn" class="btn btn-primary" type="button">Conectar biblioteca</button>
+      <button id="forgetConfigBtn" class="btn btn-secondary" type="button">Borrar configuración</button>
     </div>
     <div id="configStatus" class="status" role="status"></div>
   </section>
 
   <section id="auth" class="panel hidden">
+    <div class="eyebrow">Acceso personal</div>
     <h2 id="authTitle" class="panel-heading">Bienvenido a tu biblioteca</h2>
-    <p class="subheading">Inicia sesión para acceder a tus prompts personales.</p>
-
+    <p class="subheading">Inicia sesión para consultar y administrar tus prompts.</p>
     <label for="email">Correo electrónico</label>
     <input id="email" type="email" placeholder="tu@correo.com" autocomplete="email">
 
@@ -394,54 +218,47 @@ select { appearance: auto; }
     </div>
 
     <div id="authButtons" class="actions">
-      <button id="loginBtn" class="btn btn-primary">Iniciar sesión</button>
-      <button id="registerBtn" class="btn btn-secondary">Crear cuenta</button>
+      <button id="loginBtn" class="btn btn-primary" type="button">Iniciar sesión</button>
+      <button id="registerBtn" class="btn btn-secondary" type="button">Crear cuenta</button>
     </div>
-
     <div id="recoveryButtons" class="actions hidden">
-      <button id="forgotBtn" class="btn btn-primary">Enviar enlace de recuperación</button>
+      <button id="forgotBtn" class="btn btn-primary" type="button">Recuperar contraseña</button>
     </div>
-
     <div id="newPasswordButtons" class="actions hidden">
-      <button id="savePasswordBtn" class="btn btn-primary">Guardar nueva contraseña</button>
-      <button id="cancelRecoveryBtn" class="btn btn-secondary">Volver al inicio</button>
+      <button id="savePasswordBtn" class="btn btn-primary" type="button">Guardar nueva contraseña</button>
+      <button id="cancelRecoveryBtn" class="btn btn-secondary" type="button">Volver al inicio</button>
     </div>
-
     <div id="authStatus" class="status" role="status"></div>
   </section>
 
   <section id="app" class="hidden">
-    <div class="panel">
-      <div class="eyebrow">Espacio personal</div>
-      <div class="section-title" style="margin-top:8px">
+    <section class="panel">
+      <div class="eyebrow">Tu espacio personal</div>
+      <div class="section-title" style="margin-top:9px">
         <h2>Mi biblioteca</h2>
         <span id="userInfo" class="count"></span>
       </div>
-      <p class="subheading">Tus prompts, guardados y organizados en un solo lugar.</p>
+      <p class="subheading">Todo lo que guardas, en un solo lugar.</p>
       <div class="actions">
-        <button id="refreshBtn" class="btn btn-secondary">Actualizar biblioteca</button>
-        <button id="appLogoutBtn" class="btn btn-secondary">Cerrar sesión</button>
+        <button id="refreshBtn" class="btn btn-secondary" type="button">Actualizar</button>
+        <button id="appLogoutBtn" class="btn btn-secondary" type="button">Cerrar sesión</button>
       </div>
-    </div>
+    </section>
 
     <section id="editor" class="panel editor">
-      <div class="eyebrow">Crear y editar</div>
-      <h2 id="editorTitle" class="panel-heading" style="margin-top:8px">Añadir nuevo prompt</h2>
-      <p class="subheading">Ponle un título claro y guarda el contenido que quieras reutilizar.</p>
-
+      <div class="eyebrow">Tu siguiente creación</div>
+      <h2 id="editorTitle" class="panel-heading">Añadir nuevo prompt</h2>
+      <p class="subheading">Guarda tus ideas con un título y una categoría para encontrarlas fácilmente.</p>
       <label for="title">Título del prompt</label>
       <input id="title" type="text" maxlength="180" placeholder="Ej. Retrato cinematográfico hiperrealista">
-
       <label for="category">Categoría</label>
       <input id="category" type="text" maxlength="80" placeholder="Ej. Imágenes, video, publicidad">
-
       <label for="content">Contenido del prompt</label>
       <textarea id="content" placeholder="Escribe o pega aquí tu prompt completo..."></textarea>
-
       <div class="actions">
-        <button id="saveBtn" class="btn btn-primary">Guardar prompt</button>
-        <button id="clearBtn" class="btn btn-secondary">Limpiar</button>
-        <button id="cancelEditBtn" class="btn btn-secondary hidden">Cancelar edición</button>
+        <button id="saveBtn" class="btn btn-primary" type="button">Guardar prompt</button>
+        <button id="clearBtn" class="btn btn-secondary" type="button">Limpiar</button>
+        <button id="cancelEditBtn" class="btn btn-secondary hidden" type="button">Cancelar edición</button>
       </div>
       <div id="status" class="status" role="status"></div>
     </section>
@@ -450,19 +267,17 @@ select { appearance: auto; }
       <h2>Mis prompts</h2>
       <span id="promptCount" class="count">0 prompts</span>
     </div>
-
     <div class="toolbar">
       <input id="search" type="search" placeholder="Buscar por título o contenido..." aria-label="Buscar prompts">
       <select id="filterCategory" aria-label="Filtrar por categoría">
         <option value="">Todas las categorías</option>
       </select>
     </div>
-
     <div id="listStatus" class="status" role="status"></div>
     <div id="promptList" class="prompt-list"></div>
   </section>
 
-  <footer class="footer">DISEÑADO CON <span>LC</span> · TU BIBLIOTECA CREATIVA</footer>
+  <footer class="footer">HECHO CON <span>LC</span> · TU BIBLIOTECA CREATIVA</footer>
 </div>
 
 <script>
@@ -486,31 +301,20 @@ select { appearance: auto; }
     el.textContent = text || "";
     el.className = "status" + (text ? " " + type : "");
   }
-
-  function authMessage(text, type = "info") {
-    message("authStatus", text, type);
-  }
-  function configMessage(text, type = "info") {
-    message("configStatus", text, type);
-  }
-  function appMessage(text, type = "info") {
-    message("status", text, type);
-  }
-  function listMessage(text, type = "info") {
-    message("listStatus", text, type);
-  }
+  function authMessage(text, type = "info") { message("authStatus", text, type); }
+  function configMessage(text, type = "info") { message("configStatus", text, type); }
+  function appMessage(text, type = "info") { message("status", text, type); }
+  function listMessage(text, type = "info") { message("listStatus", text, type); }
 
   function busy(id, value) {
     const el = $(id);
-    if (!el) return;
-    el.disabled = value;
+    if (el) el.disabled = value;
   }
 
   function configIsValid(url, key) {
     try {
       const parsed = new URL(url);
-      return (parsed.protocol === "https:" || parsed.hostname === "localhost") &&
-        !!key.trim();
+      return (parsed.protocol === "https:" || parsed.hostname === "localhost") && !!key.trim();
     } catch (_) {
       return false;
     }
@@ -564,7 +368,6 @@ select { appearance: auto; }
       configMessage("Revisa la URL y la clave pública de Supabase.", "error");
       return;
     }
-
     busy("connectBtn", true);
     configMessage("Conectando con Supabase...");
 
@@ -575,18 +378,11 @@ select { appearance: auto; }
       }
 
       supabaseClient = window.supabase.createClient(url.trim(), key.trim(), {
-        auth: {
-          persistSession: true,
-          autoRefreshToken: true,
-          detectSessionInUrl: true
-        }
+        auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
       });
 
       if (save) {
-        localStorage.setItem(CONFIG_KEY, JSON.stringify({
-          url: url.trim(),
-          key: key.trim()
-        }));
+        localStorage.setItem(CONFIG_KEY, JSON.stringify({ url: url.trim(), key: key.trim() }));
       }
 
       const { data, error } = await supabaseClient.auth.getSession();
@@ -601,29 +397,26 @@ select { appearance: auto; }
         showAuth();
       }
 
-      const { data: listener } = supabaseClient.auth.onAuthStateChange(
-        async (event, session) => {
-          if (event === "PASSWORD_RECOVERY") {
-            recoveryReady = true;
-            setRecoveryUI(true);
-            showAuth();
-            authMessage("Enlace verificado. Escribe tu nueva contraseña.", "success");
-          } else if (event === "SIGNED_IN" && session?.user && !recoveryMode) {
-            currentUser = session.user;
-            showApp();
-            setTimeout(() => loadPrompts(), 0);
-          } else if (event === "SIGNED_OUT") {
-            showLoggedOut();
-          } else if (event === "USER_UPDATED" && session?.user) {
-            currentUser = session.user;
-            setRecoveryUI(false);
-            authMessage("Contraseña actualizada correctamente.", "success");
-            showAuth();
-          }
+      const { data: listener } = supabaseClient.auth.onAuthStateChange(async (event, session) => {
+        if (event === "PASSWORD_RECOVERY") {
+          recoveryReady = true;
+          setRecoveryUI(true);
+          showAuth();
+          authMessage("Enlace verificado. Escribe tu nueva contraseña.", "success");
+        } else if (event === "SIGNED_IN" && session?.user && !recoveryMode) {
+          currentUser = session.user;
+          showApp();
+          setTimeout(() => loadPrompts(), 0);
+        } else if (event === "SIGNED_OUT") {
+          showLoggedOut();
+        } else if (event === "USER_UPDATED" && session?.user) {
+          currentUser = session.user;
+          setRecoveryUI(false);
+          authMessage("Contraseña actualizada correctamente.", "success");
+          showAuth();
         }
-      );
+      });
       authSubscription = listener.subscription;
-
       configMessage("");
     } catch (error) {
       configMessage("No se pudo conectar: " + (error.message || "revisa los datos de Supabase."), "error");
@@ -638,7 +431,6 @@ select { appearance: auto; }
     const email = $("email").value.trim();
     const password = $("password").value;
     if (!email || !password) return authMessage("Escribe tu correo y contraseña.", "error");
-
     busy("loginBtn", true);
     authMessage("Iniciando sesión...");
     try {
@@ -662,19 +454,14 @@ select { appearance: auto; }
     const password = $("password").value;
     if (!email || !password) return authMessage("Escribe tu correo y una contraseña.", "error");
     if (password.length < 6) return authMessage("La contraseña debe tener al menos 6 caracteres.", "error");
-
     busy("registerBtn", true);
     authMessage("Creando tu cuenta...");
     try {
       const { data, error } = await supabaseClient.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: location.href.split("#")[0]
-        }
+        email, password,
+        options: { emailRedirectTo: location.href.split("#")[0] }
       });
       if (error) throw error;
-
       if (data.session) {
         currentUser = data.user;
         showApp();
@@ -694,7 +481,6 @@ select { appearance: auto; }
     if (!supabaseClient) return authMessage("Primero conecta Supabase.", "error");
     const email = $("email").value.trim();
     if (!email) return authMessage("Escribe primero tu correo electrónico.", "error");
-
     busy("forgotBtn", true);
     authMessage("Enviando enlace de recuperación...");
     try {
@@ -702,7 +488,7 @@ select { appearance: auto; }
         redirectTo: location.href.split("#")[0]
       });
       if (error) throw error;
-      authMessage("Si el correo está registrado, recibirás un enlace. Ábrelo en este mismo navegador donde conectaste Supabase.", "success");
+      authMessage("Si el correo está registrado, recibirás un enlace de recuperación. Ábrelo en este mismo navegador donde configuraste Supabase.", "success");
     } catch (error) {
       authMessage(error.message || "No se pudo enviar el enlace.", "error");
     } finally {
@@ -711,23 +497,18 @@ select { appearance: auto; }
   }
 
   async function saveNewPassword() {
-    if (!supabaseClient) return authMessage("No hay conexión con Supabase. Abre la app en el mismo navegador donde la configuraste.", "error");
-
+    if (!supabaseClient) return authMessage("No hay conexión con Supabase. Conecta nuevamente el proyecto.", "error");
     const password = $("newPassword").value;
-    if (password.length < 6) {
-      return authMessage("La nueva contraseña debe tener al menos 6 caracteres.", "error");
-    }
+    if (password.length < 6) return authMessage("La nueva contraseña debe tener al menos 6 caracteres.", "error");
 
     busy("savePasswordBtn", true);
     authMessage("Actualizando contraseña...");
     try {
       const { data: sessionData, error: sessionError } = await supabaseClient.auth.getSession();
       if (sessionError) throw sessionError;
-
       if (!sessionData.session && !recoveryReady) {
-        throw new Error("El enlace de recuperación no está activo. Abre nuevamente el enlace más reciente que recibiste por correo.");
+        throw new Error("El enlace de recuperación no está activo. Abre nuevamente el enlace más reciente de tu correo.");
       }
-
       const { error } = await supabaseClient.auth.updateUser({ password });
       if (error) throw error;
 
@@ -736,10 +517,9 @@ select { appearance: auto; }
       $("password").value = "";
       $("newPassword").value = "";
       setRecoveryUI(false);
-      authMessage("Contraseña actualizada. Ya puedes iniciar sesión con tu nueva contraseña.", "success");
-
       await supabaseClient.auth.signOut();
       showAuth();
+      authMessage("Contraseña actualizada. Ya puedes iniciar sesión con la nueva contraseña.", "success");
       history.replaceState(null, "", location.pathname + location.search);
     } catch (error) {
       authMessage(error.message || "No se pudo actualizar la contraseña.", "error");
@@ -780,7 +560,6 @@ select { appearance: auto; }
         .select("id,title,content,category,created_at,updated_at")
         .eq("user_id", currentUser.id)
         .order("updated_at", { ascending: false });
-
       if (error) throw error;
       prompts = data || [];
       refreshCategories();
@@ -794,10 +573,8 @@ select { appearance: auto; }
   function refreshCategories() {
     const select = $("filterCategory");
     const previous = select.value;
-    const categories = [...new Set(
-      prompts.map(p => (p.category || "").trim()).filter(Boolean)
-    )].sort((a, b) => a.localeCompare(b, "es"));
-
+    const categories = [...new Set(prompts.map(p => (p.category || "").trim()).filter(Boolean))]
+      .sort((a, b) => a.localeCompare(b, "es"));
     select.replaceChildren(new Option("Todas las categorías", ""));
     categories.forEach(category => select.add(new Option(category, category)));
     if (categories.includes(previous)) select.value = previous;
@@ -806,7 +583,6 @@ select { appearance: auto; }
   function renderPrompts() {
     const container = $("promptList");
     container.replaceChildren();
-
     const query = $("search").value.trim().toLocaleLowerCase("es");
     const category = $("filterCategory").value;
     const filtered = prompts.filter(p => {
@@ -814,7 +590,6 @@ select { appearance: auto; }
       const text = [p.title, p.content, p.category].join(" ").toLocaleLowerCase("es");
       return matchesCategory && text.includes(query);
     });
-
     $("promptCount").textContent = `${filtered.length} ${filtered.length === 1 ? "prompt" : "prompts"}`;
 
     if (!filtered.length) {
@@ -825,7 +600,7 @@ select { appearance: auto; }
       const paragraph = document.createElement("span");
       paragraph.textContent = prompts.length
         ? "Prueba con otra búsqueda o categoría."
-        : "Añade tu primer prompt usando el formulario de arriba.";
+        : "Añade tu primer prompt con el formulario de arriba.";
       empty.append(heading, paragraph);
       container.append(empty);
       return;
@@ -834,21 +609,14 @@ select { appearance: auto; }
     filtered.forEach(prompt => {
       const card = document.createElement("article");
       card.className = "prompt-card";
-
-      const top = document.createElement("div");
-      top.className = "card-top";
       const title = document.createElement("h3");
       title.textContent = prompt.title || "Sin título";
-      top.append(title);
-
       const pill = document.createElement("span");
       pill.className = "category-pill";
       pill.textContent = prompt.category || "Sin categoría";
-
       const preview = document.createElement("p");
       preview.className = "prompt-preview";
       preview.textContent = prompt.content || "";
-
       const actions = document.createElement("div");
       actions.className = "card-actions";
 
@@ -859,7 +627,6 @@ select { appearance: auto; }
         try {
           await navigator.clipboard.writeText(prompt.content || "");
           copyBtn.textContent = "¡Copiado!";
-          setTimeout(() => { copyBtn.textContent = "Copiar"; }, 1600);
         } catch (_) {
           const temp = document.createElement("textarea");
           temp.value = prompt.content || "";
@@ -867,9 +634,9 @@ select { appearance: auto; }
           temp.select();
           const ok = document.execCommand("copy");
           temp.remove();
-          copyBtn.textContent = ok ? "¡Copiado!" : "Selecciona y copia";
-          setTimeout(() => { copyBtn.textContent = "Copiar"; }, 1600);
+          copyBtn.textContent = ok ? "¡Copiado!" : "No se pudo copiar";
         }
+        setTimeout(() => { copyBtn.textContent = "Copiar"; }, 1600);
       });
 
       const editBtn = document.createElement("button");
@@ -883,7 +650,7 @@ select { appearance: auto; }
       deleteBtn.addEventListener("click", () => deletePrompt(prompt.id));
 
       actions.append(copyBtn, editBtn, deleteBtn);
-      card.append(top, pill, preview, actions);
+      card.append(title, pill, preview, actions);
       container.append(card);
     });
   }
@@ -900,19 +667,14 @@ select { appearance: auto; }
     $("cancelEditBtn").classList.remove("hidden");
     appMessage("");
     $("editor").scrollIntoView({ behavior: "smooth", block: "start" });
-    setTimeout(() => $("title").focus({ preventScroll: true }), 350);
   }
 
   async function savePrompt() {
     if (!supabaseClient || !currentUser) return appMessage("Inicia sesión para guardar prompts.", "error");
-
     const title = $("title").value.trim();
     const category = $("category").value.trim();
     const content = $("content").value.trim();
-
-    if (!title || !content) {
-      return appMessage("El título y el contenido del prompt son obligatorios.", "error");
-    }
+    if (!title || !content) return appMessage("El título y el contenido del prompt son obligatorios.", "error");
 
     busy("saveBtn", true);
     appMessage(editingId ? "Guardando cambios..." : "Guardando prompt...");
@@ -924,18 +686,13 @@ select { appearance: auto; }
         category,
         updated_at: new Date().toISOString()
       };
-
       let result;
       if (editingId) {
-        result = await supabaseClient
-          .from(TABLE)
-          .update(payload)
-          .eq("id", editingId)
-          .eq("user_id", currentUser.id);
+        result = await supabaseClient.from(TABLE).update(payload)
+          .eq("id", editingId).eq("user_id", currentUser.id);
       } else {
         result = await supabaseClient.from(TABLE).insert(payload);
       }
-
       if (result.error) throw result.error;
       clearEditor();
       appMessage("Prompt guardado correctamente.", "success");
@@ -951,15 +708,10 @@ select { appearance: auto; }
     const prompt = prompts.find(p => String(p.id) === String(id));
     if (!prompt) return;
     if (!confirm(`¿Eliminar el prompt "${prompt.title}"? Esta acción no se puede deshacer.`)) return;
-
     listMessage("Eliminando prompt...");
     try {
-      const { error } = await supabaseClient
-        .from(TABLE)
-        .delete()
-        .eq("id", id)
-        .eq("user_id", currentUser.id);
-
+      const { error } = await supabaseClient.from(TABLE).delete()
+        .eq("id", id).eq("user_id", currentUser.id);
       if (error) throw error;
       if (String(editingId) === String(id)) clearEditor();
       await loadPrompts();
@@ -969,9 +721,9 @@ select { appearance: auto; }
     }
   }
 
-  $("connectBtn").addEventListener("click", () => {
-    connect($("projectUrl").value.trim(), $("publicKey").value.trim());
-  });
+  $("connectBtn").addEventListener("click", () =>
+    connect($("projectUrl").value.trim(), $("publicKey").value.trim())
+  );
 
   $("forgetConfigBtn").addEventListener("click", () => {
     if (!confirm("¿Borrar la configuración de Supabase guardada en este navegador?")) return;
@@ -992,8 +744,6 @@ select { appearance: auto; }
     authMessage("Puedes iniciar sesión con tu contraseña actual.");
     history.replaceState(null, "", location.pathname + location.search);
   });
-
-  $("logoutBtn")?.addEventListener("click", signOut);
   $("appLogoutBtn").addEventListener("click", signOut);
   $("refreshBtn").addEventListener("click", loadPrompts);
   $("saveBtn").addEventListener("click", savePrompt);
@@ -1001,13 +751,8 @@ select { appearance: auto; }
   $("cancelEditBtn").addEventListener("click", clearEditor);
   $("search").addEventListener("input", renderPrompts);
   $("filterCategory").addEventListener("change", renderPrompts);
-
-  $("password").addEventListener("keydown", event => {
-    if (event.key === "Enter") signIn();
-  });
-  $("newPassword").addEventListener("keydown", event => {
-    if (event.key === "Enter") saveNewPassword();
-  });
+  $("password").addEventListener("keydown", e => { if (e.key === "Enter") signIn(); });
+  $("newPassword").addEventListener("keydown", e => { if (e.key === "Enter") saveNewPassword(); });
 
   (async function init() {
     const hash = new URLSearchParams(location.hash.slice(1));
@@ -1024,7 +769,6 @@ select { appearance: auto; }
       $("projectUrl").value = config.url;
       $("publicKey").value = config.key;
       await connect(config.url, config.key, false);
-
       if (isRecovery) {
         setRecoveryUI(true);
         showAuth();
@@ -1032,7 +776,7 @@ select { appearance: auto; }
     } else {
       configMessage("Conecta tu proyecto Supabase para continuar.");
       if (isRecovery) {
-        authMessage("Para restablecer la contraseña, abre este enlace en el mismo navegador donde configuraste Supabase. Si borraste la configuración, tendrás que conectarlo nuevamente.", "info");
+        authMessage("Para recuperar tu contraseña, abre el enlace en el mismo navegador donde configuraste Supabase. Si la configuración no está guardada, tendrás que conectarlo nuevamente.", "info");
       }
     }
   })();
