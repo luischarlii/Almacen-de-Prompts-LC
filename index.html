@@ -167,6 +167,56 @@ textarea{min-height:175px;resize:vertical;line-height:1.7}
   .actions .btn{flex:1 1 auto}
 }
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+
+/* Título: campo destacado */
+#title {
+  min-height: 58px;
+  padding: 17px;
+  border: 1px solid #806638;
+  border-radius: 15px;
+  background: linear-gradient(135deg, #211b12, #101012);
+  color: #f3dfaa;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: .2px;
+  box-shadow: inset 0 0 18px #d6b36a08;
+}
+
+#title::placeholder {
+  color: #a99a7b;
+  font-weight: 400;
+}
+
+/* Contenido: editor amplio y cómodo */
+#content {
+  min-height: 260px;
+  padding: 19px;
+  border: 1px solid #59482d;
+  border-radius: 17px;
+  background: #0d0d10;
+  color: #f1eee7;
+  font-size: 15px;
+  line-height: 1.9;
+  letter-spacing: .15px;
+  box-shadow: inset 0 0 22px #00000030;
+}
+
+#content::placeholder {
+  color: #77727a;
+  line-height: 1.8;
+}
+
+/* Categoría con acabado dorado */
+#category {
+  min-height: 52px;
+  border-color: #65502e;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #211b12, #111114);
+  color: #f3dfaa;
+  font-size: 14px;
+  font-weight: 600;
+}
+
 </style>
 </head>
 <body>
@@ -251,7 +301,24 @@ textarea{min-height:175px;resize:vertical;line-height:1.7}
       <p class="subheading">Guarda tus ideas con un título y una categoría para encontrarlas fácilmente.</p>
       <label for="title">Título del prompt</label>
       <input id="title" type="text" maxlength="180" placeholder="Ej. Retrato cinematográfico hiperrealista">
-      <label for="category">Categoría</label>
+      
+<label for="category">Categoría del prompt</label>
+<select id="category">
+  <option value="">Selecciona una categoría</option>
+  <option value="Imágenes IA">🎨 Imágenes IA</option>
+  <option value="Video IA">🎬 Video IA</option>
+  <option value="Fotografía">📸 Fotografía</option>
+  <option value="TikTok">📱 TikTok</option>
+  <option value="CapCut">✂️ CapCut</option>
+  <option value="Publicidad">📢 Publicidad</option>
+  <option value="Diseño gráfico">🖌️ Diseño gráfico</option>
+  <option value="Logos">✨ Logos</option>
+  <option value="Religioso">🙏 Religioso</option>
+  <option value="México y patriótico">🇲🇽 México y patriótico</option>
+  <option value="Personajes y juguetes">🧸 Personajes y juguetes</option>
+  <option value="Otros">📁 Otros</option>
+</select>
+
       <input id="category" type="text" maxlength="80" placeholder="Ej. Imágenes, video, publicidad">
       <label for="content">Contenido del prompt</label>
       <textarea id="content" placeholder="Escribe o pega aquí tu prompt completo..."></textarea>
@@ -570,15 +637,61 @@ textarea{min-height:175px;resize:vertical;line-height:1.7}
     }
   }
 
-  function refreshCategories() {
-    const select = $("filterCategory");
-    const previous = select.value;
-    const categories = [...new Set(prompts.map(p => (p.category || "").trim()).filter(Boolean))]
-      .sort((a, b) => a.localeCompare(b, "es"));
-    select.replaceChildren(new Option("Todas las categorías", ""));
-    categories.forEach(category => select.add(new Option(category, category)));
-    if (categories.includes(previous)) select.value = previous;
+  
+function refreshCategories() {
+  const filter = $("filterCategory");
+  const editorCategory = $("category");
+
+  const previousFilter = filter.value;
+  const previousEditor = editorCategory.value;
+
+  const predefined = [
+    "Imágenes IA",
+    "Video IA",
+    "Fotografía",
+    "TikTok",
+    "CapCut",
+    "Publicidad",
+    "Diseño gráfico",
+    "Logos",
+    "Religioso",
+    "México y patriótico",
+    "Personajes y juguetes",
+    "Otros"
+  ];
+
+  const existing = prompts
+    .map(p => (p.category || "").trim())
+    .filter(Boolean);
+
+  const categories = [...new Set([...predefined, ...existing])]
+    .sort((a, b) => a.localeCompare(b, "es"));
+
+  filter.replaceChildren(
+    new Option("Todas las categorías", "")
+  );
+
+  categories.forEach(category => {
+    filter.add(new Option(category, category));
+  });
+
+  editorCategory.replaceChildren(
+    new Option("Selecciona una categoría", "")
+  );
+
+  categories.forEach(category => {
+    editorCategory.add(new Option(category, category));
+  });
+
+  if (categories.includes(previousFilter)) {
+    filter.value = previousFilter;
   }
+
+  if (categories.includes(previousEditor)) {
+    editorCategory.value = previousEditor;
+  }
+}
+
 
   function renderPrompts() {
     const container = $("promptList");
