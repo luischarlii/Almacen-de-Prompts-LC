@@ -2,7 +2,7 @@
 {
   "id": "./",
   "name": "Almacen de Prompts",
-  "short_name": "LC Almacencito de Prompts",
+  "short_name": "Almacen de mis Prompts",
   "description": "Almacen de prompts para imágenes, videos y animaciones con inteligencia artificial.",
   "start_url": "./",
   "scope": "./",
