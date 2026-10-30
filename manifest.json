@@ -12,7 +12,7 @@
   "theme_color": "#111827",
   "icons": [
     {
-      "src": "./almacén.png",
+      "src": "./almacen.png",
       "sizes": "180x180",
       "type": "image/png",
       "purpose": "any"
