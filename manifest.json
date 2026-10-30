@@ -1,0 +1,21 @@
+
+{
+  "id": "./",
+  "name": "Almacen de Prompts",
+  "short_name": "LC Almacencito",
+  "description": "Almacen de prompts para imágenes, videos y animaciones con inteligencia artificial.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#111827",
+  "theme_color": "#111827",
+  "icons": [
+    {
+      "src": "./LC-imagen6.svg",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
